@@ -185,6 +185,7 @@ export default function DashboardPage() {
                       href={process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL}
                       target="_blank"
                       rel="noopener noreferrer"
+                      download
                     >
                       {t.download_button || "Скачать программу"}
                     </a>
