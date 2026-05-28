@@ -2,36 +2,42 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, AtSign, Lock, ArrowRight, Sparkles } from "lucide-react"
+import { Mail, AtSign, Lock, ArrowRight } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
 import Link from "next/link"
+import { useAuth } from "@/lib/auth-context"
+import { registerSchema, type RegisterFormData } from "@/lib/schemas"
+import { AppLogo } from "@/components/app-logo"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Field, FieldLabel, FieldError, FieldContent } from "@/components/ui/field"
+import type { RegisterResponse } from "@/lib/types"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [login, setLogin] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
+  const { t } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [touched, setTouched] = useState(false)
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-  const loginValid = login.trim().length >= 3
-  const passValid = password.length >= 6
-  const confirmValid = password === confirm
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setTouched(true)
-
-    if (!emailValid || !loginValid || !passValid || !confirmValid) return
-
+  const onSubmit = async (values: RegisterFormData) => {
     setLoading(true)
     try {
-      const { ok, data } = await apiClient("/api/auth/register", {
+      const { ok, data } = await apiClient<RegisterResponse>("/api/auth/register", {
         method: "POST",
-        body: JSON.stringify({ email, login, password }),
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
       })
 
       if (ok) {
@@ -42,10 +48,10 @@ export default function RegisterPage() {
         }
         router.push("/login")
       } else {
-        toast.error(data.message || "Ошибка регистрации")
+        toast.error(data.message || t.error_server)
       }
     } catch (error) {
-      toast.error("Произошла ошибка при подключении к серверу")
+      toast.error(t.error_server)
     } finally {
       setLoading(false)
     }
@@ -67,125 +73,77 @@ export default function RegisterPage() {
 
       <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-8 soft-shadow animate-pop-in">
         <div className="flex flex-col items-center mb-6">
-          <Link href="/" className="flex items-center gap-2 mb-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary transition hover:rotate-6 hover:scale-105">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <span className="font-sans text-xl font-semibold tracking-tight">Kaliang</span>
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">Создать аккаунт</h1>
-          <p className="text-sm text-muted-foreground mt-1">Заполните данные для регистрации</p>
+          <AppLogo className="mb-4" textClassName="text-xl" />
+          <h1 className="text-2xl font-semibold tracking-tight">{t.register_title}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t.register_subtitle}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Field
-            id="email"
-            label="E-mail"
-            icon={<Mail className="h-4 w-4" />}
-            type="email"
-            value={email}
-            onChange={setEmail}
-            placeholder="you@example.com"
-            error={touched && !emailValid ? "Введите корректный e-mail" : undefined}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <Field>
+            <FieldLabel htmlFor="email" className="text-xs font-medium text-muted-foreground">E-mail</FieldLabel>
+            <FieldContent className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                className="pl-9 rounded-xl py-5"
+                {...register("email")}
+                aria-invalid={!!errors.email}
+              />
+            </FieldContent>
+            {errors.email && <FieldError className="mt-1">{errors.email.message}</FieldError>}
+          </Field>
 
-          <Field
-            id="login"
-            label="Логин"
-            icon={<AtSign className="h-4 w-4" />}
-            type="text"
-            value={login}
-            onChange={setLogin}
-            placeholder="your_login"
-            error={touched && !loginValid ? "Логин от 3 символов" : undefined}
-          />
+          <Field>
+            <FieldLabel htmlFor="password" className="text-xs font-medium text-muted-foreground">Пароль</FieldLabel>
+            <FieldContent className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="Минимум 8 символов"
+                className="pl-9 rounded-xl py-5"
+                {...register("password")}
+                aria-invalid={!!errors.password}
+              />
+            </FieldContent>
+            {errors.password && <FieldError className="mt-1">{errors.password.message}</FieldError>}
+          </Field>
 
-          <Field
-            id="password"
-            label="Пароль"
-            icon={<Lock className="h-4 w-4" />}
-            type="password"
-            value={password}
-            onChange={setPassword}
-            placeholder="Минимум 6 символов"
-            error={touched && !passValid ? "Пароль от 6 символов" : undefined}
-          />
+          <Field>
+            <FieldLabel htmlFor="confirm" className="text-xs font-medium text-muted-foreground">Повторите пароль</FieldLabel>
+            <FieldContent className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input
+                id="confirm"
+                type="password"
+                placeholder="Повторите пароль"
+                className="pl-9 rounded-xl py-5"
+                {...register("confirm")}
+                aria-invalid={!!errors.confirm}
+              />
+            </FieldContent>
+            {errors.confirm && <FieldError className="mt-1">{errors.confirm.message}</FieldError>}
+          </Field>
 
-          <Field
-            id="confirm"
-            label="Повторите пароль"
-            icon={<Lock className="h-4 w-4" />}
-            type="password"
-            value={confirm}
-            onChange={setConfirm}
-            placeholder="Повторите пароль"
-            error={touched && !confirmValid ? "Пароли не совпадают" : undefined}
-          />
-
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02] hover:brightness-105 active:scale-[0.98] soft-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-full py-6 text-sm font-semibold soft-shadow transition hover:scale-[1.02]"
           >
-            {loading ? "Загрузка..." : "Создать аккаунт"}
+            {loading ? t.loading : t.sign_up}
             {!loading && <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />}
-          </button>
+          </Button>
         </form>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Уже есть аккаунт?{" "}
+          {t.have_account}{" "}
           <Link href="/login" className="font-semibold text-primary hover:underline">
-            Войти
+            {t.sign_in}
           </Link>
         </p>
       </div>
     </main>
-  )
-}
-
-function Field({
-  id,
-  label,
-  icon,
-  type,
-  value,
-  onChange,
-  placeholder,
-  error,
-}: {
-  id: string
-  label: string
-  icon: React.ReactNode
-  type: string
-  value: string
-  onChange: (v: string) => void
-  placeholder?: string
-  error?: string
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-xs font-medium text-muted-foreground">
-        {label}
-      </label>
-      <div className="relative mt-1.5">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-          {icon}
-        </span>
-        <input
-          id={id}
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          aria-invalid={!!error}
-          className={`w-full rounded-xl border bg-background py-2.5 pl-9 pr-3 text-sm outline-none transition focus:ring-2 ${
-            error
-              ? "border-destructive/60 focus:ring-destructive/30"
-              : "border-border focus:border-primary/60 focus:ring-primary/25"
-          }`}
-        />
-      </div>
-      {error && <p className="mt-1.5 text-xs text-destructive animate-fade-in">{error}</p>}
-    </div>
   )
 }

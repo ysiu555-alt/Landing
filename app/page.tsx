@@ -1,120 +1,37 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import {
   Download,
   KeyRound,
   Gamepad2,
   Zap,
   Shield,
-  Sparkles,
   Moon,
   Sun,
 } from "lucide-react"
 import Link from "next/link"
-import { apiClient } from "@/lib/api-client"
-
-type Lang = "ru" | "en"
-
-const dict = {
-  ru: {
-    nav_lang: "Язык",
-    theme_toggle: "Сменить тему",
-    badge: "Оптимизация Windows",
-    title_1: "Больше FPS.",
-    title_2: "Меньше задержек.",
-    subtitle:
-      "Лёгкая утилита для глубокой оптимизации Windows под популярные онлайн-игры. Один клик — стабильный FPS и минимальный пинг.",
-    download: "Скачать",
-    buy: "Купить ключ",
-    adv_tag: "Преимущества",
-    adv_title: "Создано для геймеров",
-    adv_subtitle: "Программа оптимизирует систему специально под требовательные игры.",
-    f1_title: "GTA 5 RP",
-    f1_body: "Стабильный FPS на загруженных серверах, быстрая прогрузка текстур и плавный геймплей.",
-    f2_title: "Rust",
-    f2_body: "Уменьшение фризов при больших рейдах, оптимизация памяти и приоритета процесса.",
-    f3_title: "CS 2",
-    f3_body: "Минимальные задержки ввода, точный аим и стабильные 1% low FPS в напряжённых раундах.",
-    why_tag: "Безопасно",
-    why_title: "Прозрачно и обратимо",
-    why_body:
-      "Перед каждым изменением создаётся резервная копия. Любую настройку можно откатить в один клик.",
-    chip_safe: "Резервные копии",
-    chip_revert: "Откат в 1 клик",
-    chip_light: "До 10 МБ ОЗУ",
-    sign_in: "Войти",
-    sign_up: "Регистрация",
-    footer: "© Kaliang. Все права защищены.",
-  },
-  en: {
-    nav_lang: "Language",
-    theme_toggle: "Toggle theme",
-    badge: "Windows Optimization",
-    title_1: "More FPS.",
-    title_2: "Less latency.",
-    subtitle:
-      "A lightweight Windows optimization utility tuned for popular online games. One click — stable FPS and minimal ping.",
-    download: "Download",
-    buy: "Buy a key",
-    adv_tag: "Advantages",
-    adv_title: "Built for gamers",
-    adv_subtitle: "The app optimizes your system specifically for demanding online titles.",
-    f1_title: "GTA 5 RP",
-    f1_body: "Stable FPS on crowded servers, faster texture streaming and smoother gameplay.",
-    f2_title: "Rust",
-    f2_body: "Fewer stutters during large raids, memory optimization and process priority tuning.",
-    f3_title: "CS 2",
-    f3_body: "Minimal input latency, precise aim and stable 1% low FPS during intense rounds.",
-    why_tag: "Safe",
-    why_title: "Transparent and reversible",
-    why_body: "A backup is created before every change. Any tweak can be reverted in one click.",
-    chip_safe: "Auto backups",
-    chip_revert: "1-click revert",
-    chip_light: "Under 10 MB RAM",
-    sign_in: "Sign in",
-    sign_up: "Sign up",
-    footer: "© Kaliang. All rights reserved.",
-  },
-} as const
+import { useAuth } from "@/lib/auth-context"
+import { useTheme } from "next-themes"
+import { FeatureCard } from "@/components/feature-card"
+import { StatusChip } from "@/components/status-chip"
+import { AppLogo } from "@/components/app-logo"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 export default function Page() {
-  const [lang, setLang] = useState<Lang>("ru")
-  const [dark, setDark] = useState(false)
-  const t = dict[lang]
-
-  // Auth state
-  const [user, setUser] = useState<any | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const token = localStorage.getItem("vortex_jwt_token")
-    if (token) {
-      apiClient("/api/auth/me").then(({ ok, data }) => {
-        if (ok) setUser(data)
-        else localStorage.removeItem("vortex_jwt_token")
-        setLoading(false)
-      })
-    } else {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const root = document.documentElement
-    if (dark) root.classList.add("dark")
-    else root.classList.remove("dark")
-  }, [dark])
+  const { user, lang, setLang, t, logout } = useAuth()
+  const { theme, setTheme } = useTheme()
+  const router = useRouter()
 
   const openPay = () => {
-    window.location.href = "/dashboard"
+    router.push("/dashboard")
   }
 
   const openDownload = () => {
     if (!user) {
-      window.location.href = "/login"
+      router.push("/login")
     } else {
-      // Hook up your real download link later
       window.open("#", "_blank", "noopener,noreferrer")
     }
   }
@@ -139,23 +56,20 @@ export default function Page() {
       />
 
       <header className="relative z-10 mx-auto flex max-w-5xl items-center justify-between px-6 py-6 animate-fade-up">
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary transition hover:rotate-6 hover:scale-105">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <span className="font-sans text-base font-semibold tracking-tight">Kaliang</span>
-        </div>
+        <AppLogo />
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setDark((d) => !d)}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={t.theme_toggle}
-            aria-pressed={dark}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:scale-105 hover:text-primary soft-shadow"
+            className="rounded-full h-9 w-9 soft-shadow"
           >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
+
           <div
             role="group"
             aria-label={t.nav_lang}
@@ -192,7 +106,11 @@ export default function Page() {
               href="/dashboard"
               className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-card pl-1 pr-3 text-xs font-medium transition hover:scale-[1.03] hover:border-primary/50 soft-shadow"
             >
-              <Avatar src={null} fallback={user.email || "User"} className="h-7 w-7" />
+              <Avatar className="h-7 w-7">
+                <AvatarFallback className="bg-primary/25 text-[10px] font-bold text-primary">
+                  {user.email.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <span className="hidden sm:inline max-w-[120px] truncate">{user.email}</span>
             </Link>
           ) : (
@@ -227,34 +145,33 @@ export default function Page() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-fade-up delay-300">
-          <button
-            type="button"
+          <Button
             onClick={openDownload}
-            className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:scale-[1.03] hover:brightness-105 active:scale-[0.98] soft-shadow"
+            className="rounded-full px-6 py-6 text-sm font-semibold soft-shadow transition hover:scale-[1.03]"
           >
-            <Download className="h-4 w-4 transition group-hover:-translate-y-0.5" />
+            <Download className="h-4 w-4" />
             {t.download}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="outline"
             onClick={openPay}
-            className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition hover:scale-[1.03] hover:border-primary/60 hover:text-primary active:scale-[0.98]"
+            className="rounded-full px-6 py-6 text-sm font-semibold bg-card hover:text-primary hover:border-primary/60 soft-shadow transition hover:scale-[1.03]"
           >
-            <KeyRound className="h-4 w-4 transition group-hover:rotate-12" />
+            <KeyRound className="h-4 w-4" />
             {t.buy}
-          </button>
+          </Button>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-xs animate-fade-up delay-400">
-          <Chip>{t.chip_safe}</Chip>
-          <Chip tone="accent">{t.chip_revert}</Chip>
-          <Chip>{t.chip_light}</Chip>
+          <StatusChip>{t.chip_safe}</StatusChip>
+          <StatusChip tone="accent">{t.chip_revert}</StatusChip>
+          <StatusChip>{t.chip_light}</StatusChip>
         </div>
       </section>
 
       <section className="relative z-10 mx-auto max-w-5xl px-6 pb-24">
         <div className="text-center animate-fade-up">
-          <div className="font-mono text-[11px] tracking-widest text-primary">{t.adv_tag}</div>
+          <div className="font-mono text-[11px] tracking-widest text-primary uppercase">{t.adv_tag}</div>
           <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight md:text-3xl">
             {t.adv_title}
           </h2>
@@ -264,21 +181,21 @@ export default function Page() {
         </div>
 
         <div className="mt-10 grid gap-5 md:grid-cols-3">
-          <Feature
+          <FeatureCard
             icon={<Gamepad2 className="h-5 w-5" />}
             title={t.f1_title}
             body={t.f1_body}
             tone="primary"
             delay="delay-100"
           />
-          <Feature
+          <FeatureCard
             icon={<Zap className="h-5 w-5" />}
             title={t.f2_title}
             body={t.f2_body}
             tone="accent"
             delay="delay-200"
           />
-          <Feature
+          <FeatureCard
             icon={<Shield className="h-5 w-5" />}
             title={t.f3_title}
             body={t.f3_body}
@@ -288,7 +205,7 @@ export default function Page() {
         </div>
 
         <div className="mt-12 rounded-2xl border border-border bg-card p-8 text-center soft-shadow animate-fade-up delay-200">
-          <div className="font-mono text-[11px] tracking-widest text-accent-foreground/80">
+          <div className="font-mono text-[11px] tracking-widest text-accent-foreground/80 uppercase">
             {t.why_tag}
           </div>
           <h3 className="mt-2 text-balance text-xl font-semibold md:text-2xl">{t.why_title}</h3>
@@ -305,79 +222,5 @@ export default function Page() {
         </div>
       </footer>
     </main>
-  )
-}
-
-function Chip({
-  children,
-  tone = "primary",
-}: {
-  children: React.ReactNode
-  tone?: "primary" | "accent"
-}) {
-  return (
-    <span
-      className={`rounded-full border px-3 py-1 transition hover:-translate-y-0.5 ${
-        tone === "accent"
-          ? "border-accent/50 bg-accent/30 text-accent-foreground"
-          : "border-primary/40 bg-primary/15 text-primary-foreground/90"
-      }`}
-    >
-      {children}
-    </span>
-  )
-}
-
-function Feature({
-  icon,
-  title,
-  body,
-  tone,
-  delay,
-}: {
-  icon: React.ReactNode
-  title: string
-  body: string
-  tone: "primary" | "accent"
-  delay?: string
-}) {
-  return (
-    <div
-      className={`group rounded-2xl border border-border bg-card p-6 transition duration-300 hover:-translate-y-1 hover:border-primary/40 soft-shadow animate-fade-up ${delay ?? ""}`}
-    >
-      <div
-        className={`flex h-11 w-11 items-center justify-center rounded-xl transition group-hover:scale-110 group-hover:rotate-3 ${
-          tone === "accent" ? "bg-accent/40 text-accent-foreground" : "bg-primary/20 text-primary"
-        }`}
-      >
-        {icon}
-      </div>
-      <h3 className="mt-4 text-lg font-semibold tracking-tight">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
-    </div>
-  )
-}
-
-function Avatar({
-  src,
-  fallback,
-  className = "",
-}: {
-  src: string | null
-  fallback: string
-  className?: string
-}) {
-  const initials = fallback.slice(0, 2).toUpperCase()
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/25 text-[11px] font-semibold text-primary ${className}`}
-    >
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src || "/placeholder.svg"} alt="" className="h-full w-full object-cover" />
-      ) : (
-        initials
-      )}
-    </span>
   )
 }

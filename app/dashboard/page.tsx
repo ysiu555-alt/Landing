@@ -8,64 +8,34 @@ import {
   BadgeCheck,
   Calendar,
   LogOut,
-  Sparkles,
   CreditCard,
   Ticket,
   ArrowRight,
 } from "lucide-react"
 import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
-import Link from "next/link"
-
-type SubscriptionType = "TRIAL_3DAYS" | "WEEK_2" | "MONTH_1" | "LIFETIME" | "NONE"
-
-interface UserData {
-  email: string
-  subscription_type: SubscriptionType
-  expires_at: string | null
-}
+import { useAuth } from "@/lib/auth-context"
+import { AppLogo } from "@/components/app-logo"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import type { SubscriptionType, BuyResponse, RedeemResponse } from "@/lib/types"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [user, setUser] = useState<UserData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading, logout, t, refreshUser } = useAuth()
   const [coupon, setCoupon] = useState("")
   const [couponLoading, setCouponLoading] = useState(false)
 
   useEffect(() => {
-    const token = localStorage.getItem("vortex_jwt_token")
-    if (!token) {
+    if (!authLoading && !user) {
       router.push("/login")
-      return
     }
-
-    fetchUserData()
-  }, [])
-
-  const fetchUserData = async () => {
-    try {
-      const { ok, data } = await apiClient("/api/auth/me")
-      if (ok) {
-        setUser(data)
-      } else {
-        localStorage.removeItem("vortex_jwt_token")
-        router.push("/login")
-      }
-    } catch (error) {
-      toast.error("Ошибка загрузки данных профиля")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("vortex_jwt_token")
-    router.push("/login")
-  }
+  }, [user, authLoading, router])
 
   const handlePurchase = async (planType: string) => {
     try {
-      const { ok, data } = await apiClient("/api/billing/buy", {
+      const { ok, data } = await apiClient<BuyResponse>("/api/billing/buy", {
         method: "POST",
         body: JSON.stringify({ plan: planType }),
       })
@@ -86,7 +56,7 @@ export default function DashboardPage() {
 
     setCouponLoading(true)
     try {
-      const { ok, data } = await apiClient("/api/billing/redeem", {
+      const { ok, data } = await apiClient<RedeemResponse>("/api/billing/redeem", {
         method: "POST",
         body: JSON.stringify({ code: coupon }),
       })
@@ -94,7 +64,7 @@ export default function DashboardPage() {
       if (ok) {
         toast.success(`Успешно! Активирован тариф: ${data.plan_name || "Подписка обновлена"}`)
         setCoupon("")
-        fetchUserData() // Refresh data
+        refreshUser()
       } else {
         toast.error(data.message || "Код не существует или уже активирован")
       }
@@ -106,7 +76,7 @@ export default function DashboardPage() {
   }
 
   const formatExpiry = (dateStr: string | null, type: SubscriptionType) => {
-    if (type === "LIFETIME") return "Навсегда"
+    if (type === "LIFETIME") return t.forever
     if (!dateStr) return "—"
     try {
       return new Date(dateStr).toLocaleString("ru-RU", {
@@ -121,10 +91,10 @@ export default function DashboardPage() {
     }
   }
 
-  if (loading) {
+  if (authLoading || (!user && !authLoading)) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-background">
-        <div className="animate-pulse text-primary font-semibold">Загрузка...</div>
+        <div className="animate-pulse text-primary font-semibold">{t.loading}</div>
       </div>
     )
   }
@@ -144,111 +114,110 @@ export default function DashboardPage() {
       />
 
       <header className="relative z-10 mx-auto flex max-w-5xl items-center justify-between px-6 py-6 animate-fade-up">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/20 text-primary transition hover:rotate-6 hover:scale-105">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <span className="font-sans text-base font-semibold tracking-tight">Vortex</span>
-        </Link>
+        <AppLogo />
 
-        <button
-          onClick={handleLogout}
-          className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-destructive transition hover:scale-[1.03] hover:border-destructive/50 soft-shadow"
+        <Button
+          variant="outline"
+          onClick={logout}
+          className="rounded-full h-9 gap-2 text-destructive border-border soft-shadow transition hover:border-destructive/50"
         >
           <LogOut className="h-4 w-4" />
-          <span>Выйти</span>
-        </button>
+          <span>{t.logout}</span>
+        </Button>
       </header>
 
       <section className="relative z-10 mx-auto max-w-5xl px-6 py-10">
-        <h1 className="text-3xl font-semibold tracking-tight mb-8">Личный кабинет</h1>
+        <h1 className="text-3xl font-semibold tracking-tight mb-8">{t.dashboard}</h1>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {/* User Info Card */}
           <div className="md:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-border bg-card p-6 soft-shadow animate-fade-up">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <User className="h-5 w-5 text-primary" />
-                Профиль
-              </h2>
-              <div className="space-y-4">
+            <Card className="rounded-2xl border-border bg-card soft-shadow animate-fade-up">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <User className="h-5 w-5 text-primary" />
+                  {t.profile}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-center justify-between py-3 border-b border-border">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Mail className="h-4 w-4" />
-                    E-mail
+                    {t.email}
                   </div>
                   <div className="text-sm font-medium">{user?.email}</div>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-border">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <BadgeCheck className="h-4 w-4" />
-                    Тип подписки
+                    {t.sub_type}
                   </div>
                   <div className="text-sm font-semibold text-primary">
-                    {user?.subscription_type === "NONE" ? "Подписка отсутствует" : user?.subscription_type}
+                    {user?.subscription_type === "NONE" ? t.no_sub : user?.subscription_type}
                   </div>
                 </div>
                 <div className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
-                    Действует до
+                    {t.expires_at}
                   </div>
                   <div className="text-sm font-medium">
                     {formatExpiry(user?.expires_at || null, user?.subscription_type || "NONE")}
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            {/* Redeem Code Card */}
-            <div className="rounded-2xl border border-border bg-card p-6 soft-shadow animate-fade-up delay-100">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Ticket className="h-5 w-5 text-accent" />
-                Активация кода
-              </h2>
-              <form onSubmit={handleRedeemCode} className="flex gap-2">
-                <input
-                  type="text"
-                  value={coupon}
-                  onChange={(e) => setCoupon(e.target.value)}
-                  placeholder="Введите код (например, с FunPay)"
-                  className="flex-1 rounded-xl border border-border bg-background px-4 py-2 text-sm outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/25"
-                />
-                <button
-                  type="submit"
-                  disabled={couponLoading || !coupon.trim()}
-                  className="rounded-xl bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground transition hover:brightness-105 active:scale-95 disabled:opacity-50"
-                >
-                  {couponLoading ? "..." : "Активировать"}
-                </button>
-              </form>
-            </div>
+            <Card className="rounded-2xl border-border bg-card soft-shadow animate-fade-up delay-100">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <Ticket className="h-5 w-5 text-accent" />
+                  {t.redeem_code}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleRedeemCode} className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={coupon}
+                    onChange={(e) => setCoupon(e.target.value)}
+                    placeholder={t.code_placeholder}
+                    className="flex-1 rounded-xl border-border bg-background px-4 py-5 text-sm"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={couponLoading || !coupon.trim()}
+                    className="rounded-xl px-6 py-5 text-sm font-semibold soft-shadow"
+                  >
+                    {couponLoading ? "..." : t.activate}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Billing Sidebar */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2 px-2">
               <CreditCard className="h-5 w-5 text-primary" />
-              Тарифы
+              {t.plans_title}
             </h2>
             <PlanCard
-              name="2 Недели"
+              name={t.week_2}
               price="290 ₽"
-              type="WEEK_2"
               onClick={() => handlePurchase("WEEK_2")}
+              t={t}
             />
             <PlanCard
-              name="1 Месяц"
+              name={t.month_1}
               price="490 ₽"
-              type="MONTH_1"
               highlight
               onClick={() => handlePurchase("MONTH_1")}
+              t={t}
             />
             <PlanCard
-              name="Навсегда"
+              name={t.forever}
               price="1990 ₽"
-              type="LIFETIME"
               onClick={() => handlePurchase("LIFETIME")}
+              t={t}
             />
           </div>
         </div>
@@ -260,39 +229,38 @@ export default function DashboardPage() {
 function PlanCard({
   name,
   price,
-  type,
   highlight = false,
   onClick,
+  t,
 }: {
   name: string
   price: string
-  type: string
   highlight?: boolean
   onClick: () => void
+  t: any
 }) {
   return (
-    <div
+    <Card
       className={`rounded-2xl border p-5 transition hover:-translate-y-1 soft-shadow animate-fade-up ${
         highlight ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border bg-card"
       }`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${highlight ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${highlight ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
           {name}
         </span>
       </div>
       <div className="text-2xl font-bold mb-4">{price}</div>
-      <button
+      <Button
         onClick={onClick}
-        className={`group flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition ${
-          highlight
-            ? "bg-primary text-primary-foreground hover:brightness-110"
-            : "border border-border bg-background hover:border-primary/50 hover:text-primary"
+        variant={highlight ? "default" : "outline"}
+        className={`group w-full rounded-xl py-5 text-sm font-semibold soft-shadow transition ${
+          !highlight && "hover:border-primary/50 hover:text-primary bg-background"
         }`}
       >
-        Купить
+        {t.buy_button}
         <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-      </button>
-    </div>
+      </Button>
+    </Card>
   )
 }
