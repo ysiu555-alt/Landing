@@ -108,10 +108,10 @@ export default function Page() {
             >
               <Avatar className="h-7 w-7">
                 <AvatarFallback className="bg-primary/25 text-[10px] font-bold text-primary">
-                  {user.email.slice(0, 2).toUpperCase()}
+                  {user?.email?.slice(0, 2).toUpperCase() || "??"}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden sm:inline max-w-[120px] truncate">{user.email}</span>
+              <span className="hidden sm:inline max-w-[120px] truncate">{user?.email || "Гость"}</span>
             </Link>
           ) : (
             <div className="inline-flex items-center gap-1.5">
