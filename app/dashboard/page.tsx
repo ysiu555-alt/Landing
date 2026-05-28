@@ -11,6 +11,7 @@ import {
   CreditCard,
   Ticket,
   ArrowRight,
+  Download,
 } from "lucide-react"
 import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
@@ -164,6 +165,39 @@ export default function DashboardPage() {
                     {formatExpiry(user?.expires_at || null, user?.subscription_type || "NONE")}
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl border-border bg-card soft-shadow animate-fade-up delay-200">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <Download className="h-5 w-5 text-primary" />
+                  {t.download_title || "Скачивание"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {user?.subscription_type !== "NONE" ? (
+                  <Button
+                    asChild
+                    className="w-full rounded-xl py-6 text-sm font-semibold soft-shadow transition hover:scale-[1.02]"
+                  >
+                    <a
+                      href={process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t.download_button || "Скачать программу"}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="w-full rounded-xl py-6 text-sm font-semibold soft-shadow"
+                    variant="outline"
+                  >
+                    {t.no_access_download || "Доступно после активации подписки"}
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
