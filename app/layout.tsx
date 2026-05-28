@@ -6,8 +6,8 @@ import { AuthProvider } from '@/lib/auth-context'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
-const geist = Geist({ subsets: ['latin', 'cyrillic'], variable: '--font-sans' })
-const geistMono = Geist_Mono({ subsets: ['latin', 'cyrillic'], variable: '--font-mono' })
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
   title: 'Vortex — оптимизация для GTA 5 RP, Rust, CS 2',
