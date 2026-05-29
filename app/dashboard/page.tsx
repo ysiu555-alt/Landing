@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   User,
   Mail,
@@ -12,6 +13,7 @@ import {
   Ticket,
   ArrowRight,
   Download,
+  Zap
 } from "lucide-react"
 import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
