@@ -10,7 +10,7 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
-  title: 'Vortex — оптимизация для GTA 5 RP, Rust, CS 2',
+  title: 'Kaliang — оптимизация для GTA 5 RP, Rust, CS 2',
   description:
     'Лёгкая утилита для глубокой оптимизации Windows под популярные игры: GTA 5 RP, Rust, CS 2.',
   generator: 'v0.app',
@@ -26,7 +26,8 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster position="top-center" richColors />
-            {process.env.NODE_ENV === 'production' && <Analytics />}
+            {/* Vercel Analytics disabled for Cloudflare Pages compatibility */}
+            {/* {process.env.NODE_ENV === 'production' && <Analytics />} */}
           </AuthProvider>
         </ThemeProvider>
       </body>

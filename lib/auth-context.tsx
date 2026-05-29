@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Load lang from local storage if available
-    const savedLang = localStorage.getItem('vortex_lang') as Language
+    const savedLang = localStorage.getItem('kaliang_lang') as Language
     if (savedLang && (savedLang === 'ru' || savedLang === 'en')) {
       setLang(savedLang)
     }
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const refreshUser = async () => {
-    const token = localStorage.getItem('vortex_jwt_token')
+    const token = localStorage.getItem('kaliang_jwt_token')
     if (!token) {
       setLoading(false)
       return
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (ok) {
         setUser(data)
       } else {
-        localStorage.removeItem('vortex_jwt_token')
+        localStorage.removeItem('kaliang_jwt_token')
         setUser(null)
       }
     } catch (error) {
@@ -60,20 +60,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem('vortex_jwt_token', token)
+    localStorage.setItem('kaliang_jwt_token', token)
     setUser(userData)
     router.push('/dashboard')
   }
 
   const logout = () => {
-    localStorage.removeItem('vortex_jwt_token')
+    localStorage.removeItem('kaliang_jwt_token')
     setUser(null)
     router.push('/login')
   }
 
   const handleSetLang = (newLang: Language) => {
     setLang(newLang)
-    localStorage.setItem('vortex_lang', newLang)
+    localStorage.setItem('kaliang_lang', newLang)
   }
 
   return (
