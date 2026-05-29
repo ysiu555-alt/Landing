@@ -232,20 +232,20 @@ export default function DashboardPage() {
             </h2>
             <PlanCard
               name={t.week_2}
-              price="290 ₽"
+              price="50 ₽"
               onClick={() => handlePurchase("WEEK_2")}
               t={t}
             />
             <PlanCard
               name={t.month_1}
-              price="490 ₽"
+              price="70 ₽"
               highlight
               onClick={() => handlePurchase("MONTH_1")}
               t={t}
             />
             <PlanCard
               name={t.forever}
-              price="1990 ₽"
+              price="500 ₽"
               onClick={() => handlePurchase("LIFETIME")}
               t={t}
             />
