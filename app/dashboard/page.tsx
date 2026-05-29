@@ -1,6 +1,7 @@
+/** @jsxImportSource react */
 "use client"
 
-import React, { useEffect, useState } from "react"
+import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -27,10 +28,10 @@ import type { SubscriptionType, BuyResponse, RedeemResponse } from "@/lib/types"
 export default function DashboardPage() {
   const router = useRouter()
   const { user, loading: authLoading, logout, t, refreshUser } = useAuth()
-  const [coupon, setCoupon] = useState("")
-  const [couponLoading, setCouponLoading] = useState(false)
+  const [coupon, setCoupon] = React.useState("")
+  const [couponLoading, setCouponLoading] = React.useState(false)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login")
     }
