@@ -19,6 +19,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// Helper functions for cookies
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString()
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`
+}
+
+const getCookie = (name: string) => {
+  return document.cookie.split('; ').reduce((r, v) => {
+    const parts = v.split('=')
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r
+  }, '')
+}
+
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -29,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Load lang from local storage if available
-    const savedLang = localStorage.getItem('kaliang_lang') as Language
+    const savedLang = typeof window !== 'undefined' ? localStorage.getItem('kaliang_lang') as Language : null
     if (savedLang && (savedLang === 'ru' || savedLang === 'en')) {
       setLang(savedLang)
     }
@@ -38,18 +55,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const refreshUser = async () => {
-    const token = localStorage.getItem('kaliang_jwt_token')
+    const token = typeof window !== 'undefined' ? (localStorage.getItem('kaliang_jwt_token') || getCookie('kaliang_jwt_token')) : null
+    
     if (!token) {
       setLoading(false)
       return
     }
 
     try {
-      const { ok, data } = await apiClient('/api/auth/me')
-      if (ok) {
-        setUser(data)
+      const { ok, data } = await apiClient('/api/auth/profile')
+      if (ok && data.user) {
+        setUser(data.user)
+        // Sync token back to both if only one had it
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kaliang_jwt_token', token)
+          setCookie('kaliang_jwt_token', token, 7)
+        }
       } else {
-        localStorage.removeItem('kaliang_jwt_token')
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('kaliang_jwt_token')
+          deleteCookie('kaliang_jwt_token')
+        }
         setUser(null)
       }
     } catch (error) {
@@ -60,20 +86,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem('kaliang_jwt_token', token)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kaliang_jwt_token', token)
+      setCookie('kaliang_jwt_token', token, 7)
+    }
     setUser(userData)
     router.push('/dashboard')
   }
 
   const logout = () => {
-    localStorage.removeItem('kaliang_jwt_token')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('kaliang_jwt_token')
+      deleteCookie('kaliang_jwt_token')
+    }
     setUser(null)
     router.push('/login')
   }
 
   const handleSetLang = (newLang: Language) => {
     setLang(newLang)
-    localStorage.setItem('kaliang_lang', newLang)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kaliang_lang', newLang)
+    }
   }
 
   return (

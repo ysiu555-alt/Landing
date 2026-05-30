@@ -227,8 +227,7 @@ export default function Page() {
           <div className="flex items-center gap-4">
             <span>{t.footer}</span>
             <div className="w-1 h-1 rounded-full bg-white/10" />
-            <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms</a>
+            <Link href="/terms" className="hover:text-primary transition-colors">{t.terms}</Link>
           </div>
           <span className="font-mono bg-white/5 px-3 py-1 rounded-full">CORE_V1.0</span>
         </div>

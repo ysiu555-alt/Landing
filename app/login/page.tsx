@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, ArrowRight } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -17,8 +17,16 @@ import { Field, FieldLabel, FieldError, FieldContent } from "@/components/ui/fie
 import type { AuthResponse } from "@/lib/types"
 
 export default function LoginPage() {
-  const { login, t } = useAuth()
+  const { login, t, user, loading: authLoading } = useAuth()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/dashboard")
+    }
+  }, [user, authLoading, router])
 
   const {
     register,

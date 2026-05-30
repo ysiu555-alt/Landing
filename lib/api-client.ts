@@ -1,7 +1,18 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
+// Helper to get cookie in api-client
+const getCookie = (name: string) => {
+  if (typeof document === 'undefined') return '';
+  return document.cookie.split('; ').reduce((r, v) => {
+    const parts = v.split('=')
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r
+  }, '')
+}
+
 export async function apiClient<T = any>(endpoint: string, options: RequestInit = {}) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('kaliang_jwt_token') : null;
+  const token = typeof window !== 'undefined' 
+    ? (localStorage.getItem('kaliang_jwt_token') || getCookie('kaliang_jwt_token')) 
+    : null;
 
   const headers = {
     'Content-Type': 'application/json',

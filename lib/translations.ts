@@ -57,6 +57,7 @@ export const translations = {
     error_auth: "Неверный логин или пароль",
     success_login: "Успешный вход!",
     success_register: "Регистрация успешна!",
+    terms: "Соглашение",
   },
   en: {
     nav_lang: "Language",
@@ -113,5 +114,8 @@ export const translations = {
     error_auth: "Invalid email or password",
     success_login: "Success login!",
     success_register: "Success registration!",
+    terms: "Terms",
   },
+} as const;
+
 } as const;
