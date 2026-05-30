@@ -76,12 +76,12 @@ export default function Page() {
       {/* aggressive premium blobs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 -z-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px] animate-blob"
+        className="pointer-events-none absolute -left-32 -top-32 -z-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px] animate-blob will-change-transform"
         style={{ background: "oklch(0.6 0.16 250)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 top-24 -z-0 h-[500px] w-[500px] rounded-full opacity-15 blur-[120px] animate-blob-alt"
+        className="pointer-events-none absolute -right-24 top-24 -z-0 h-[500px] w-[500px] rounded-full opacity-15 blur-[120px] animate-blob-alt will-change-transform"
         style={{ background: "oklch(0.6 0.16 250)" }}
       />
       
