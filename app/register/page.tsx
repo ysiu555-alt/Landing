@@ -15,11 +15,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError, FieldContent } from "@/components/ui/field"
 import type { RegisterResponse } from "@/lib/types"
+import { VerificationModal } from "@/components/verification-modal"
 
 export default function RegisterPage() {
   const router = useRouter()
   const { t } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [formData, setFormData] = useState<RegisterFormData | null>(null)
 
   const {
     register,
@@ -31,12 +34,31 @@ export default function RegisterPage() {
 
   const onSubmit = async (values: RegisterFormData) => {
     setLoading(true)
+    // 1. Сначала запрашиваем код
+    const { ok, data } = await apiClient("/api/auth/send-code", {
+      method: "POST",
+      body: JSON.stringify({ email: values.email }),
+    })
+
+    if (ok) {
+      setFormData(values)
+      setIsModalOpen(true)
+    } else {
+      toast.error(data.message || "Ошибка отправки кода")
+    }
+    setLoading(false)
+  }
+
+  const handleVerified = async (code: string) => {
+    if (!formData) return
+    setLoading(true)
     try {
       const { ok, data } = await apiClient<RegisterResponse>("/api/auth/register", {
         method: "POST",
         body: JSON.stringify({
-          email: values.email,
-          password: values.password,
+          email: formData.email,
+          password: formData.password,
+          code, // Передаем код для подтверждения регистрации
         }),
       })
 
@@ -144,6 +166,15 @@ export default function RegisterPage() {
           </Link>
         </p>
       </div>
+      
+      {formData && (
+        <VerificationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          email={formData.email}
+          onVerified={handleVerified}
+        />
+      )}
     </main>
   )
 }
