@@ -26,6 +26,19 @@ export default function Page() {
   const { user, lang, setLang, t, logout } = useAuth()
   const { theme, setTheme } = useTheme()
   const router = useRouter()
+  const [showTermsModal, setShowTermsModal] = React.useState(false)
+
+  React.useEffect(() => {
+    const accepted = localStorage.getItem('kaliang_terms_accepted')
+    if (!accepted) {
+      setShowTermsModal(true)
+    }
+  }, [])
+
+  const acceptTerms = () => {
+    localStorage.setItem('kaliang_terms_accepted', 'true')
+    setShowTermsModal(false)
+  }
 
   const openPay = () => {
     router.push("/dashboard")
@@ -38,6 +51,25 @@ export default function Page() {
       window.open("#", "_blank", "noopener,noreferrer")
     }
   }
+
+  const agreementText = `Пользовательское соглашение (Оферта)
+Настоящее Соглашение является публичной офертой и регулирует использование программного обеспечения Kaliang — «ПО»
+1. Предмет соглашения
+1.1. ПО представляет собой утилиту для автоматизированной настройки и оптимизации параметров операционной системы Windows с целью улучшения её быстродействия.
+1.2. Используя ПО, Пользователь подтверждает, что осознает характер выполняемых программой действий (внесение изменений в реестр, управление системными процессами, очистка временных файлов).
+2. Права и обязанности сторон
+2.1. Правообладатель: Обеспечивает доступ к функционалу ПО после успешной оплаты. Оставляет за собой право блокировать доступ к ПО в случае нарушения Пользователем условий использования.
+2.2. Пользователь: Обязуется использовать ПО исключительно на устройствах, находящихся в его законном владении. Важно: Пользователь обязуется создать точку восстановления системы Windows перед запуском процедур оптимизации.
+3. Отказ от ответственности 
+3.1. ПО предоставляется на условиях «как есть» (as is). Правообладатель не несет ответственности за любые последствия, возникшие в результате использования ПО.
+3.2. Пользователь принимает на себя все риски, связанные с внесением изменений в системные параметры Windows.
+4. Лицензирование и оплата
+4.1. Доступ к ПО предоставляется в виде временной лицензии (подписки) или бессрочной лицензии (Lifetime).
+4.2. Система лицензирования использует уникальный идентификатор оборудования (HWID).
+4.3. Возврат денежных средств не производится, если технический функционал ПО исправен.
+5. Конфиденциальность
+5.1. ПО собирает и передает на сервер техническую информацию: HWID, версию ОС и статус подписки. Персональные данные не собираются.
+6. Контакты и реквизиты: Telegram: https://t.me/Kaliang_Support`
 
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#050508] text-[#E0E0E6]">
@@ -54,6 +86,35 @@ export default function Page() {
       />
       
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+
+      {/* Terms Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-[#0A0A0F] border border-white/10 rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl"
+          >
+            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+              <h2 className="text-xl font-bold tracking-tight">Пользовательское соглашение</h2>
+              <Zap className="h-5 w-5 text-primary fill-primary" />
+            </div>
+            <div className="p-8 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+              <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-sans leading-relaxed">
+                {agreementText}
+              </pre>
+            </div>
+            <div className="p-8 border-t border-white/5 bg-white/[0.02]">
+              <Button 
+                onClick={acceptTerms}
+                className="w-full h-14 rounded-2xl text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+              >
+                Принять и продолжить
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-8 py-8 animate-fade-in">
         <div className="flex items-center gap-3">
@@ -221,6 +282,12 @@ export default function Page() {
           </p>
         </motion.div>
       </section>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-8 pb-10">
+        <div className="text-[9px] font-medium leading-relaxed text-muted-foreground/20 whitespace-pre-wrap select-none text-center">
+          {agreementText}
+        </div>
+      </div>
 
       <footer className="relative z-10 border-t border-white/5 bg-black/20">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
