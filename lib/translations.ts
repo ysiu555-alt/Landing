@@ -117,5 +117,3 @@ export const translations = {
     terms: "Terms",
   },
 } as const;
-
-} as const;
