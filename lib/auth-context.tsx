@@ -54,6 +54,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser()
   }, [])
 
+  // Force re-render of components using 't' when lang changes
+  const [_, setTick] = useState(0)
+  useEffect(() => {
+    setTick(t => t + 1)
+  }, [lang])
+
   const refreshUser = async () => {
     const token = typeof window !== 'undefined' ? (localStorage.getItem('kaliang_jwt_token') || getCookie('kaliang_jwt_token')) : null
     
