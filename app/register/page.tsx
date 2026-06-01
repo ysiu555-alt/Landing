@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, Lock, ArrowRight } from "lucide-react"
+import { Mail, Lock, ArrowRight, Zap } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { useAuth } from "@/lib/auth-context"
 import { registerSchema, type RegisterFormData } from "@/lib/schemas"
-import { AppLogo } from "@/components/app-logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError, FieldContent } from "@/components/ui/field"
@@ -65,92 +65,112 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-background text-foreground flex items-center justify-center p-4">
-      {/* Background blobs */}
+    <main className="relative min-h-svh overflow-hidden bg-[#050508] text-[#E0E0E6] flex items-center justify-center p-6">
+      {/* Background effects */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 -z-0 h-[480px] w-[480px] rounded-full opacity-70 blur-3xl animate-blob"
-        style={{ background: "radial-gradient(closest-side, oklch(0.88 0.07 320 / 0.7), transparent 70%)" }}
+        className="pointer-events-none absolute -left-32 -top-32 -z-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px] animate-blob"
+        style={{ background: "oklch(0.6 0.16 250)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 top-24 -z-0 h-[420px] w-[420px] rounded-full opacity-70 blur-3xl animate-blob-alt"
-        style={{ background: "radial-gradient(closest-side, oklch(0.88 0.08 170 / 0.65), transparent 70%)" }}
+        className="pointer-events-none absolute -right-24 bottom-24 -z-0 h-[500px] w-[500px] rounded-full opacity-15 blur-[120px] animate-blob-alt"
+        style={{ background: "oklch(0.6 0.16 250)" }}
       />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-8 soft-shadow animate-pop-in">
-        <div className="flex flex-col items-center mb-6">
-          <AppLogo className="mb-4" textClassName="text-xl" />
-          <h1 className="text-2xl font-semibold tracking-tight">{t.register_title}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t.register_subtitle}</p>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 w-full max-w-md"
+      >
+        <div className="flex flex-col items-center mb-10">
+          <Link href="/" className="flex items-center gap-3 mb-8 group transition-transform hover:scale-105">
+            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+              <Zap className="h-7 w-7 text-white fill-white" />
+            </div>
+            <span className="text-2xl font-black italic tracking-tighter uppercase">Kaliang</span>
+          </Link>
+          <h1 className="text-4xl font-black tracking-tighter italic uppercase text-center">{t.register_title}</h1>
+          <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-[0.2em] mt-2 opacity-50">{t.register_subtitle}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Field>
-            <FieldLabel htmlFor="email" className="text-xs font-medium text-muted-foreground">E-mail</FieldLabel>
-            <FieldContent className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                className="pl-9 rounded-xl py-5"
-                {...register("email")}
-                aria-invalid={!!errors.email}
-              />
-            </FieldContent>
-            {errors.email && <FieldError className="mt-1">{errors.email.message}</FieldError>}
-          </Field>
+        <div className="bg-white/[0.02] border border-white/5 rounded-[40px] p-10 backdrop-blur-md shadow-2xl">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <Field>
+              <FieldLabel htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-50 mb-2 block ml-1">
+                E-MAIL
+              </FieldLabel>
+              <FieldContent className="relative">
+                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 z-10" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  className="pl-14 rounded-2xl border-white/10 bg-white/[0.03] px-6 py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10"
+                  {...register("email")}
+                  aria-invalid={!!errors.email}
+                />
+              </FieldContent>
+              {errors.email && <FieldError className="mt-2 ml-1 text-xs font-bold uppercase tracking-wider text-red-400 opacity-80">{errors.email.message}</FieldError>}
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="password" className="text-xs font-medium text-muted-foreground">Пароль</FieldLabel>
-            <FieldContent className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="Минимум 8 символов"
-                className="pl-9 rounded-xl py-5"
-                {...register("password")}
-                aria-invalid={!!errors.password}
-              />
-            </FieldContent>
-            {errors.password && <FieldError className="mt-1">{errors.password.message}</FieldError>}
-          </Field>
+            <Field>
+              <FieldLabel htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-50 mb-2 block ml-1">
+                {t.password || "ПАРОЛЬ"}
+              </FieldLabel>
+              <FieldContent className="relative">
+                <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 z-10" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  className="pl-14 rounded-2xl border-white/10 bg-white/[0.03] px-6 py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10"
+                  {...register("password")}
+                  aria-invalid={!!errors.password}
+                />
+              </FieldContent>
+              {errors.password && <FieldError className="mt-2 ml-1 text-xs font-bold uppercase tracking-wider text-red-400 opacity-80">{errors.password.message}</FieldError>}
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="confirm" className="text-xs font-medium text-muted-foreground">Повторите пароль</FieldLabel>
-            <FieldContent className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-              <Input
-                id="confirm"
-                type="password"
-                placeholder="Повторите пароль"
-                className="pl-9 rounded-xl py-5"
-                {...register("confirm")}
-                aria-invalid={!!errors.confirm}
-              />
-            </FieldContent>
-            {errors.confirm && <FieldError className="mt-1">{errors.confirm.message}</FieldError>}
-          </Field>
+            <Field>
+              <FieldLabel htmlFor="confirm" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-50 mb-2 block ml-1">
+                {t.confirm_password || "ПОВТОРИТЕ ПАРОЛЬ"}
+              </FieldLabel>
+              <FieldContent className="relative">
+                <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 z-10" />
+                <Input
+                  id="confirm"
+                  type="password"
+                  placeholder="••••••••"
+                  className="pl-14 rounded-2xl border-white/10 bg-white/[0.03] px-6 py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10"
+                  {...register("confirm")}
+                  aria-invalid={!!errors.confirm}
+                />
+              </FieldContent>
+              {errors.confirm && <FieldError className="mt-2 ml-1 text-xs font-bold uppercase tracking-wider text-red-400 opacity-80">{errors.confirm.message}</FieldError>}
+            </Field>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-full py-6 text-sm font-semibold soft-shadow transition hover:scale-[1.02]"
-          >
-            {loading ? t.loading : t.sign_up}
-            {!loading && <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-2xl py-8 text-lg font-black uppercase tracking-tighter shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 mt-4"
+            >
+              {loading ? "..." : t.sign_up}
+              {!loading && <ArrowRight className="h-5 w-5 ml-2" />}
+            </Button>
+          </form>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          {t.have_account}{" "}
-          <Link href="/login" className="font-semibold text-primary hover:underline">
-            {t.sign_in}
-          </Link>
-        </p>
-      </div>
+          <div className="mt-8 pt-8 border-t border-white/5 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">
+              {t.have_account}{" "}
+              <Link href="/login" className="text-primary font-black hover:underline ml-1">
+                {t.sign_in}
+              </Link>
+            </p>
+          </div>
+        </div>
+      </motion.div>
     </main>
   )
 }
