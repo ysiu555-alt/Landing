@@ -14,7 +14,8 @@ import {
   Ticket,
   ArrowRight,
   Download,
-  Zap
+  Zap,
+  ExternalLink
 } from "lucide-react"
 import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
@@ -286,14 +287,14 @@ export default function DashboardPage() {
         
         {/* Footer Funpay Block */}
         <div className="mt-12 max-w-sm">
-          <Card className="rounded-3xl border-white/5 bg-white/[0.02]">
-            <CardContent className="p-6 flex flex-col gap-4">
-              <h3 className="text-lg font-black italic uppercase">Funpay</h3>
+          <Card className="rounded-3xl border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.01] backdrop-blur-sm">
+            <CardContent className="p-8 flex flex-col gap-5">
+              <h3 className="text-xl font-black italic uppercase tracking-tighter">Funpay</h3>
               <p className="text-muted-foreground text-sm font-bold">Официальный Funpay для покупки ключей</p>
               <Button
-                variant="outline"
-                className="w-full rounded-xl"
-                onClick={() => window.open("https://funpay.com/users/17795957/", "_blank")}
+                variant="secondary"
+                className="w-full rounded-2xl py-6 font-black uppercase tracking-widest shadow-lg shadow-black/20 hover:bg-primary hover:text-white transition-all"
+                onClick={() => window.open("https://funpay.com/users/19751070/", "_blank")}
               >
                 Перейти
                 <ExternalLink className="h-4 w-4 ml-2" />

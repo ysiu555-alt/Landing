@@ -12,7 +12,7 @@ export function Footer() {
           title="Funpay"
           description="Официальный Funpay для покупки ключей"
           buttonText="Перейти"
-          link="https://funpay.com/users/17795957/"
+          link="https://funpay.com/users/19751070/"
         />
         <FooterCard
           title="Поддержка"
@@ -35,13 +35,13 @@ export function Footer() {
 
 function FooterCard({ title, description, buttonText, link }: { title: string, description: string, buttonText: string, link: string }) {
   return (
-    <Card className="rounded-3xl border-white/5 bg-white/[0.02]">
-      <CardContent className="p-6 flex flex-col gap-4">
-        <h3 className="text-lg font-black italic uppercase">{title}</h3>
-        <p className="text-muted-foreground text-sm font-bold">{description}</p>
+    <Card className="rounded-3xl border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.01] backdrop-blur-sm transition-all hover:border-primary/30">
+      <CardContent className="p-8 flex flex-col gap-5">
+        <h3 className="text-xl font-black italic uppercase tracking-tighter">{title}</h3>
+        <p className="text-muted-foreground text-sm font-bold leading-relaxed">{description}</p>
         <Button
-          variant="outline"
-          className="w-full rounded-xl"
+          variant="secondary"
+          className="w-full rounded-2xl py-6 font-black uppercase tracking-widest shadow-lg shadow-black/20 hover:bg-primary hover:text-white transition-all"
           onClick={() => window.open(link, "_blank")}
         >
           {buttonText}
