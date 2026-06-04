@@ -283,6 +283,24 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        
+        {/* Footer Funpay Block */}
+        <div className="mt-12 max-w-sm">
+          <Card className="rounded-3xl border-white/5 bg-white/[0.02]">
+            <CardContent className="p-6 flex flex-col gap-4">
+              <h3 className="text-lg font-black italic uppercase">Funpay</h3>
+              <p className="text-muted-foreground text-sm font-bold">Официальный Funpay для покупки ключей</p>
+              <Button
+                variant="outline"
+                className="w-full rounded-xl"
+                onClick={() => window.open("https://funpay.com/users/17795957/", "_blank")}
+              >
+                Перейти
+                <ExternalLink className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </section>
     </main>
   )

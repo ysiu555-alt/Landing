@@ -104,7 +104,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   placeholder="name@example.com"
-                  className="pl-14 rounded-2xl border-white/10 bg-white/[0.03] px-6 py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10"
+                  className="pl-14 pr-6 rounded-2xl border-white/10 bg-white/[0.03] py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10 text-center"
                   {...register("email")}
                   aria-invalid={!!errors.email}
                 />
@@ -122,7 +122,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  className="pl-14 rounded-2xl border-white/10 bg-white/[0.03] px-6 py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10"
+                  className="pl-14 pr-6 rounded-2xl border-white/10 bg-white/[0.03] py-7 text-sm font-bold focus:border-primary/50 transition-all placeholder:text-white/10 text-center"
                   {...register("password")}
                   aria-invalid={!!errors.password}
                 />

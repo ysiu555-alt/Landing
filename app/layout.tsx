@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/lib/auth-context'
 import { Toaster } from '@/components/ui/sonner'
+import { Footer } from '@/components/footer'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -25,6 +26,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AuthProvider>
             {children}
+            <Footer />
             <Toaster position="top-center" richColors />
             {/* Vercel Analytics disabled for Cloudflare Pages compatibility */}
             {/* {process.env.NODE_ENV === 'production' && <Analytics />} */}
