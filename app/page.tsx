@@ -288,17 +288,6 @@ export default function Page() {
           {agreementText}
         </div>
       </div>
-
-      <footer className="relative z-10 border-t border-white/5 bg-black/20">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
-          <div className="flex items-center gap-4">
-            <span>{t.footer}</span>
-            <div className="w-1 h-1 rounded-full bg-white/10" />
-            <Link href="/terms" className="hover:text-primary transition-colors">{t.terms}</Link>
-          </div>
-          <span className="font-mono bg-white/5 px-3 py-1 rounded-full">CORE_V1.0</span>
-        </div>
-      </footer>
     </main>
   )
 }
