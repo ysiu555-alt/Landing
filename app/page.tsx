@@ -21,6 +21,7 @@ import { AppLogo } from "@/components/app-logo"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { Footer } from "@/components/footer"
 
 export default function Page() {
   const { user, lang, setLang, t, logout } = useAuth()
@@ -283,9 +284,19 @@ export default function Page() {
         </motion.div>
       </section>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-8 pb-10">
+      <Footer />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-8 pb-20">
         <div className="text-[9px] font-medium leading-relaxed text-muted-foreground/20 whitespace-pre-wrap select-none text-center">
           {agreementText}
+        </div>
+        <div className="mt-8 text-center">
+          <Link 
+            href="/terms" 
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
+          >
+            Открыть на отдельной странице
+          </Link>
         </div>
       </div>
     </main>
