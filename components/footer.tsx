@@ -7,6 +7,13 @@ import { ExternalLink } from "lucide-react"
 export function Footer() {
   return (
     <footer className="relative z-10 mx-auto max-w-6xl px-8 py-12">
+      {/* Background blobs */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/4 top-1/4 -z-10 h-[400px] w-[400px] rounded-full opacity-10 blur-[100px]"
+        style={{ background: "oklch(0.6 0.16 250)" }}
+      />
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FooterCard
           title="Funpay"
