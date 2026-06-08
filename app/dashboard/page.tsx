@@ -204,7 +204,7 @@ export default function DashboardPage() {
                     <Button
                       className="w-full rounded-2xl py-8 text-lg font-black uppercase tracking-tighter shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
                       onClick={() => {
-                        window.open("https://github.com/ysiu555-alt/Landing/releases/download/1.0.0beta/KALIANG-Setup-1.0.0.exe", "_blank");
+                        window.open(process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL || "#", "_blank");
                       }}
                     >
                       {t.download_button || "СКАЧАТЬ"}

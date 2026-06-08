@@ -49,7 +49,7 @@ export default function Page() {
     if (!user) {
       router.push("/login")
     } else {
-      window.open("#", "_blank", "noopener,noreferrer")
+      window.open(process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL || "#", "_blank", "noopener,noreferrer")
     }
   }
 

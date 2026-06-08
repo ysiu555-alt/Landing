@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   email: z.string().email("Введите корректный e-mail"),
   password: z.string().min(8, "Пароль должен быть от 8 символов").max(64, "Пароль слишком длинный"),
-  confirm: z.string().min(8, "Повторите пароль"),
+  confirm: z.string().min(8, "Повторите пароль").max(64, "Пароль слишком длинный"),
 }).refine((data) => data.password === data.confirm, {
   message: "Пароли не совпадают",
   path: ["confirm"],

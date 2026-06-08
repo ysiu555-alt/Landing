@@ -38,7 +38,7 @@ export async function apiClient<T = any>(endpoint: string, options: RequestInit 
     return {
       ok: false,
       status: 500,
-      data: { message: "Network error" } as any as T,
+      data: { message: "Network error" } as T,
     };
   }
 }

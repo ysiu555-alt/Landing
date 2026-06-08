@@ -62,10 +62,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     const token = typeof window !== 'undefined' ? (localStorage.getItem('kaliang_jwt_token') || getCookie('kaliang_jwt_token')) : null
-    
+
     if (!token) {
       setLoading(false)
       return
+    }
+
+    // Sprawdź czy token nie jest wygasły (dekodej z JWT)
+    try {
+      const decoded = JSON.parse(atob(token.split('.')[1]))
+      const now = Date.now() / 1000
+      if (decoded.exp && decoded.exp < now) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('kaliang_jwt_token')
+          deleteCookie('kaliang_jwt_token')
+        }
+        setUser(null)
+        setLoading(false)
+        return
+      }
+    } catch (e) {
+      console.error('Token decode error:', e)
     }
 
     try {
