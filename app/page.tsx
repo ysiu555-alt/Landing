@@ -8,23 +8,19 @@ import {
   Gamepad2,
   Zap,
   Shield,
-  Moon,
-  Sun,
 } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth-context"
-import { useTheme } from "next-themes"
 import { FeatureCard } from "@/components/feature-card"
-import { StatusChip } from "@/components/status-chip"
 import { AppLogo } from "@/components/app-logo"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Footer } from "@/components/footer"
 import { SITE_CONFIG } from "@/lib/config"
 
-export default function Page() {
+export default function LandingPage() {
   const router = useRouter()
   const { user, lang, setLang, t, logout } = useAuth()
   const [showTermsModal, setShowTermsModal] = React.useState(false)
@@ -83,12 +79,12 @@ export default function Page() {
       {/* aggressive premium blobs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 -z-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px] animate-blob will-change-transform"
+        className="pointer-events-none absolute -left-32 -top-32 -z-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px] animate-blob"
         style={{ background: "oklch(0.6 0.16 250)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 top-24 -z-0 h-[500px] w-[500px] rounded-full opacity-15 blur-[120px] animate-blob-alt will-change-transform"
+        className="pointer-events-none absolute -right-24 top-24 -z-0 h-[500px] w-[500px] rounded-full opacity-15 blur-[120px] animate-blob-alt"
         style={{ background: "oklch(0.6 0.16 250)" }}
       />
       
@@ -96,7 +92,7 @@ export default function Page() {
 
       {/* Terms Modal */}
       {showTermsModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -123,7 +119,7 @@ export default function Page() {
         </div>
       )}
 
-      <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-8 py-8 animate-fade-in">
+      <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-8 py-8">
         <AppLogo />
         
         <div className="flex items-center gap-6">
@@ -234,34 +230,27 @@ export default function Page() {
 
       <section className="relative z-10 mx-auto max-w-6xl px-8 pb-32">
         <div className="grid gap-8 md:grid-cols-3">
-          {[
-            {
-              title: t.f1_title,
-              description: t.f1_body,
-              icon: "🎮",
-              delay: 0
-            },
-            {
-              title: t.f2_title,
-              description: t.f2_body,
-              icon: "⚡",
-              delay: 0.1
-            },
-            {
-              title: t.f3_title,
-              description: t.f3_body,
-              icon: "🎯",
-              delay: 0.2
-            }
-          ].map((feature, i) => (
-            <FeatureCard
-              key={i}
-              title={feature.title}
-              description={feature.description}
-              icon={feature.icon}
-              delay={feature.delay}
-            />
-          ))}
+          <FeatureCard
+            title={t.f1_title}
+            body={t.f1_body}
+            icon="🎮"
+            tone="primary"
+            delay="delay-0"
+          />
+          <FeatureCard
+            title={t.f2_title}
+            body={t.f2_body}
+            icon="⚡"
+            tone="accent"
+            delay="delay-100"
+          />
+          <FeatureCard
+            title={t.f3_title}
+            body={t.f3_body}
+            icon="🎯"
+            tone="primary"
+            delay="delay-200"
+          />
         </div>
       </section>
 
