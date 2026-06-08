@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { SubscriptionType, BuyResponse, RedeemResponse } from "@/lib/types"
+import { SITE_CONFIG } from "@/lib/config"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -37,6 +38,16 @@ export default function DashboardPage() {
       router.push("/login")
     }
   }, [user, authLoading, router])
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = SITE_CONFIG.downloadUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handlePurchase = async (planType: string) => {
     try {
@@ -203,9 +214,7 @@ export default function DashboardPage() {
                   {user?.subscription_type !== "NONE" ? (
                     <Button
                       className="w-full rounded-2xl py-8 text-lg font-black uppercase tracking-tighter shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
-                      onClick={() => {
-                        window.open(process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL || "#", "_blank");
-                      }}
+                      onClick={handleDownload}
                     >
                       {t.download_button || "СКАЧАТЬ"}
                     </Button>

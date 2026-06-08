@@ -22,11 +22,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Footer } from "@/components/footer"
+import { SITE_CONFIG } from "@/lib/config"
 
 export default function Page() {
-  const { user, lang, setLang, t, logout } = useAuth()
-  const { theme, setTheme } = useTheme()
   const router = useRouter()
+  const { user, lang, setLang, t, logout } = useAuth()
   const [showTermsModal, setShowTermsModal] = React.useState(false)
 
   React.useEffect(() => {
@@ -49,7 +49,13 @@ export default function Page() {
     if (!user) {
       router.push("/login")
     } else {
-      window.open(process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL || "#", "_blank", "noopener,noreferrer")
+      const link = document.createElement("a");
+      link.href = SITE_CONFIG.downloadUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   }
 
@@ -90,117 +96,98 @@ export default function Page() {
 
       {/* Terms Modal */}
       {showTermsModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-in fade-in duration-300">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-[#0A0A0F] border border-white/10 rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-2xl rounded-[40px] border border-white/10 bg-[#0A0A0F] p-8 shadow-2xl"
           >
-            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-              <h2 className="text-xl font-bold tracking-tight">Пользовательское соглашение</h2>
-              <Zap className="h-5 w-5 text-primary fill-primary" />
+            <div className="mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h2 className="text-2xl font-black italic uppercase tracking-tight">{t.terms}</h2>
             </div>
-            <div className="p-8 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
-              <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-sans leading-relaxed">
+            <div className="mb-8 max-h-[40vh] overflow-y-auto rounded-2xl bg-white/[0.03] p-6 text-sm font-medium leading-relaxed text-muted-foreground">
+              <pre className="whitespace-pre-wrap font-sans">
                 {agreementText}
               </pre>
             </div>
-            <div className="p-8 border-t border-white/5 bg-white/[0.02]">
-              <Button 
-                onClick={acceptTerms}
-                className="w-full h-14 rounded-2xl text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
-              >
-                Принять и продолжить
-              </Button>
-            </div>
+            <Button 
+              onClick={acceptTerms}
+              className="w-full rounded-2xl py-8 text-lg font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95"
+            >
+              ПРИНЯТЬ И ПРОДОЛЖИТЬ
+            </Button>
           </motion.div>
         </div>
       )}
 
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-8 py-8 animate-fade-in">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <Zap className="h-6 w-6 text-white fill-white" />
-          </div>
-          <span className="text-xl font-black italic tracking-tighter uppercase">Kaliang</span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div
-            role="group"
-            className="hidden md:flex items-center rounded-2xl border border-white/5 bg-white/[0.02] p-1 text-[10px] font-black uppercase tracking-widest"
-          >
-            <button
-              type="button"
-              onClick={() => setLang("ru")}
-              className={`rounded-xl px-4 py-2 transition-all ${
-                lang === "ru" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-white"
-              }`}
+      <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-8 py-8 animate-fade-in">
+        <AppLogo />
+        
+        <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-6 md:flex">
+             <button
+              onClick={() => setLang(lang === "ru" ? "en" : "ru")}
+              className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
             >
-              RU
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className={`rounded-xl px-4 py-2 transition-all ${
-                lang === "en" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-white"
-              }`}
-            >
-              EN
+              {lang === "ru" ? "EN" : "RU"}
             </button>
           </div>
 
           {user ? (
-            <Link
-              href="/dashboard"
-              className="inline-flex h-12 items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.03] pl-2 pr-5 text-sm font-bold transition-all hover:bg-white/[0.06] hover:border-primary/30"
-            >
-              <Avatar className="h-8 w-8 rounded-xl border border-white/10">
-                <AvatarFallback className="bg-primary/20 text-[10px] font-black text-primary">
-                  {user?.email?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="max-w-[120px] truncate">{user?.email}</span>
-            </Link>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="px-6 py-3 text-sm font-bold text-muted-foreground hover:text-white transition-colors"
-              >
-                {t.sign_in}
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard">
+                <Button variant="ghost" className="rounded-2xl gap-2 font-bold hover:bg-white/5">
+                  <Avatar className="h-6 w-6 border border-white/10">
+                    <AvatarFallback className="bg-primary/20 text-[10px] text-primary font-black uppercase">
+                      {user.email[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline">{t.dashboard}</span>
+                </Button>
               </Link>
-              <Link
-                href="/register"
-                className="bg-primary hover:bg-primary/90 px-8 py-3 rounded-2xl text-sm font-black text-white shadow-xl shadow-primary/20 transition-all transform active:scale-95"
-              >
-                {t.sign_up}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" className="rounded-2xl font-bold px-6 uppercase tracking-tight text-sm">
+                  {t.sign_in}
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button className="rounded-2xl font-black px-6 uppercase tracking-tight text-sm shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]">
+                  {t.sign_up}
+                </Button>
               </Link>
             </div>
           )}
         </div>
-      </header>
+      </nav>
 
-      <section className="relative z-10 mx-auto max-w-4xl px-8 pb-24 pt-20 text-center">
-        <motion.div 
+      <section className="relative z-10 mx-auto max-w-4xl px-8 py-24 text-center">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-10"
+          className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary"
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+          <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           {t.badge}
         </motion.div>
         
         <motion.h1 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-balance font-black tracking-tighter text-5xl md:text-8xl italic leading-[0.9]"
+          className="mt-8 text-6xl font-[1000] italic leading-[0.9] tracking-tighter uppercase sm:text-8xl md:text-9xl"
         >
           {t.title_1} <br />
-          <span className="text-primary not-italic">{t.title_2}</span>
+          <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/40 bg-clip-text text-transparent">
+            {t.title_2}
+          </span>
         </motion.h1>
-        
+
         <motion.p 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -248,57 +235,37 @@ export default function Page() {
       <section className="relative z-10 mx-auto max-w-6xl px-8 pb-32">
         <div className="grid gap-8 md:grid-cols-3">
           {[
-            { icon: <Gamepad2 />, title: t.f1_title, body: t.f1_body, color: "#1BBE43" },
-            { icon: <Zap />, title: t.f2_title, body: t.f2_body, color: "#CE422B" },
-            { icon: <Shield />, title: t.f3_title, body: t.f3_body, color: "#DEA02C" },
+            {
+              title: t.f1_title,
+              description: t.f1_body,
+              icon: "🎮",
+              delay: 0
+            },
+            {
+              title: t.f2_title,
+              description: t.f2_body,
+              icon: "⚡",
+              delay: 0.1
+            },
+            {
+              title: t.f3_title,
+              description: t.f3_body,
+              icon: "🎯",
+              delay: 0.2
+            }
           ].map((feature, i) => (
-            <motion.div
+            <FeatureCard
               key={i}
-              whileHover={{ y: -10 }}
-              className="group relative bg-white/[0.02] border border-white/5 rounded-[40px] p-10 overflow-hidden transition-all hover:border-primary/30 hover:bg-white/[0.04]"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 opacity-20 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: feature.color }} />
-              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 text-primary group-hover:scale-110 transition-transform">
-                {React.cloneElement(feature.icon as React.ReactElement, { size: 28 })}
-              </div>
-              <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed font-medium">{feature.body}</p>
-            </motion.div>
+              title={feature.title}
+              description={feature.description}
+              icon={feature.icon}
+              delay={feature.delay}
+            />
           ))}
         </div>
-
-        <motion.div 
-          whileHover={{ scale: 1.01 }}
-          className="mt-12 rounded-[40px] border border-white/5 bg-gradient-to-br from-white/[0.03] to-transparent p-12 text-center relative overflow-hidden group"
-        >
-          <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
-            <Shield size={120} className="text-primary" />
-          </div>
-          <div className="font-black text-[10px] tracking-[0.3em] text-primary uppercase mb-4">
-            {t.why_tag}
-          </div>
-          <h3 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase mb-6">{t.why_title}</h3>
-          <p className="mx-auto max-w-2xl text-lg font-medium leading-relaxed text-muted-foreground">
-            {t.why_body}
-          </p>
-        </motion.div>
       </section>
 
       <Footer />
-
-      <div className="relative z-10 mx-auto max-w-6xl px-8 pb-20">
-        <div className="text-[9px] font-medium leading-relaxed text-muted-foreground/20 whitespace-pre-wrap select-none text-center">
-          {agreementText}
-        </div>
-        <div className="mt-8 text-center">
-          <Link 
-            href="/terms" 
-            className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
-          >
-            Открыть на отдельной странице
-          </Link>
-        </div>
-      </div>
     </main>
   )
 }
